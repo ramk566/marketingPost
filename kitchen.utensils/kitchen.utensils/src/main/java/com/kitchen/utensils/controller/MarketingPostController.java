@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 
+@CrossOrigin(origins = "http://127.0.0.1:5500") // Allow frontend access
 @RestController
 @RequestMapping("/kitchen-utensils")
 public class MarketingPostController {
