@@ -19,4 +19,6 @@ public class MarketingPost {
     @JsonProperty("No")
     private int No;
     private String content;
+
+    private String imageUrl;
 }
