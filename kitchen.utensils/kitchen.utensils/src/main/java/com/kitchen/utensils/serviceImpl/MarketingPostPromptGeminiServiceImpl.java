@@ -94,7 +94,7 @@ public class MarketingPostPromptGeminiServiceImpl implements MarketingPostPrompt
                 "\"No\": 2,\n" +
                 "\"content\": \"...\"\n" +
                 "}]\n" +
-                "Return only a valid JSON array, no extra text, no JSON.stringify. Prompt starts with generate/create keyword. Each prompt is at least 3 lines.");
+                "Return only a valid JSON array, no extra text, no JSON.stringify. Prompt starts with generate/create keyword. Each prompt is at least 3 lines.don't mention in post RequestDto and dto things ");
         return part;
     }
 

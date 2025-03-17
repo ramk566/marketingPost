@@ -9,13 +9,12 @@ import com.kitchen.utensils.service.MarketingPostPromptGeminiService;
 import com.kitchen.utensils.service.MarketingPostGeminiService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map;
 
 @CrossOrigin(origins = "http://127.0.0.1:5500")
 @RestController
-@RequestMapping("/api/kitchen-utensils")
+@RequestMapping("/api/gemini")
 public class MarketingPostGeminiController {
 
     private final MarketingPostGeminiService marketingPostService;
@@ -33,9 +32,10 @@ public class MarketingPostGeminiController {
             return ResponseEntity.ok(response);
         } catch (Exception ex) {
             return ResponseEntity.internalServerError()
-                    .body(new ApiResponse<>(ResponseMessage.ERROR, "An unexpected error occurred", Collections.emptyList()));
+                    .body(new ApiResponse<>(ResponseMessage.ERROR, "An unexpected error occurred", new ArrayList<MarketingPost>()));
         }
     }
+
 
     @PostMapping("/generate-prompt")
     public ResponseEntity<ApiResponse<MarketingPost>> generatePrompt(@RequestBody RequestDto promptDto) {

@@ -8,15 +8,38 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder({"No", "content"}) // Ensures "No" appears first
+@JsonPropertyOrder({"No", "content"})
 
 public class MarketingPost {
+
     @JsonProperty("No")
     private int No;
     private String content;
+
+    public MarketingPost(){
+
+    }
+
+    public MarketingPost(int no, String content) {
+        No = no;
+        this.content = content;
+    }
+
+    public int getNo() {
+        return No;
+    }
+
+    public void setNo(int no) {
+        No = no;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }
