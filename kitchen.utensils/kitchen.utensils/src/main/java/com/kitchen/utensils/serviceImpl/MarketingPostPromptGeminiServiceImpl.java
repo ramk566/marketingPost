@@ -125,20 +125,18 @@ public class MarketingPostPromptGeminiServiceImpl implements MarketingPostPrompt
     }
 
     private List<MarketingPost> extractJsonArray(String text) throws JsonProcessingException {
-        logger.debug("Extracting JSON array from response text.");
         text = text.trim();
-        if (text.startsWith("```json")) {
-            text = text.substring(7);
-        }
-        if (text.endsWith("```")) {
-            text = text.substring(0, text.length() - 3);
-        }
 
-        text = text.trim();
-        if (!text.startsWith("[") || !text.endsWith("]")) {
+        int startIndex = text.indexOf("[");
+        int endIndex = text.lastIndexOf("]");
+
+        if (startIndex == -1 || endIndex == -1 || startIndex > endIndex) {
+            logger.warn("Response does not contain a valid JSON array.");
             return Collections.emptyList();
         }
+        text = text.substring(startIndex, endIndex + 1).trim();
 
+        logger.debug("Extracting JSON array from response text.");
         return objectMapper.readValue(text, new TypeReference<List<MarketingPost>>() {});
     }
 }
