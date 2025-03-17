@@ -1,4 +1,4 @@
-package com.kitchen.utensils.serviceImpl;
+package com.kitchen.utensils.service.serviceImpl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
