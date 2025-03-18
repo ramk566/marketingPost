@@ -167,7 +167,7 @@ public class MarketingPostServiceImpl implements MarketingPostService {
 
     private List<PromptRequest> parsePostPromptResponse(String responseBody) throws AiApiException {
         try {
-            logger.debug("Parsing marketing post response.");
+            logger.debug("Parsing marketing post prompt response.");
 
             JsonNode jsonResponse = objectMapper.readTree(responseBody);
             List<PromptRequest> marketingPosts = new ArrayList<>();
@@ -182,7 +182,7 @@ public class MarketingPostServiceImpl implements MarketingPostService {
                     marketingPosts.add(new PromptRequest(no, postContent));
                 }
             }
-            logger.info("Parsed {} marketing posts.", marketingPosts.size());
+            logger.info("Parsed {} marketing posts prompt.", marketingPosts.size());
 
             System.out.println("MarketingPost::"+marketingPosts);
             return marketingPosts;
@@ -219,7 +219,6 @@ public class MarketingPostServiceImpl implements MarketingPostService {
             HttpEntity<List<Map<String, Object>>> request = new HttpEntity<>(requestBody, headers);
             ResponseEntity<String> response = restTemplate.exchange(RUNWARE_AI_URL, HttpMethod.POST, request, String.class);
 
-            System.out.println("Response::::"+ response);
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
 
                 JsonNode rootNode = objectMapper.readTree(response.getBody());

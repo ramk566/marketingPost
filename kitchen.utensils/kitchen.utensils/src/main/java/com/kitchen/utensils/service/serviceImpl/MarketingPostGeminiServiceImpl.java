@@ -169,5 +169,4 @@ public class MarketingPostGeminiServiceImpl implements MarketingPostGeminiServic
         }
         return null;
     }
-
 }
