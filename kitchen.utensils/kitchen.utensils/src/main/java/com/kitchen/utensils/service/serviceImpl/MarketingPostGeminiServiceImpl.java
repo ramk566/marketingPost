@@ -22,11 +22,15 @@ public class MarketingPostGeminiServiceImpl implements MarketingPostGeminiServic
     private static final Logger logger = LoggerFactory.getLogger(MarketingPostGeminiServiceImpl.class);
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private static final String API_KEY = "AIzaSyADDv36cfbNwvbHTSODWJFIa69eJxuz6fo";
-    private static final String URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY;
+
+    private static final String GEMINI_API_KEY = "AIzaSyADDv36cfbNwvbHTSODWJFIa69eJxuz6fo";
+    private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
+    private static final String RUNWARE_AI_URL = "https://api.runware.ai/v1";
+    private static final String RUNWARE_API_KEY = "QLHKNkitolTw90rMBYakcyUnpBGdSDZR";
+
 
     @Override
-    public ApiResponse<MarketingPost> generateContent(MarketingPostRequest prompt) {
+    public ApiResponse<MarketingPost> generateMarketingPostContent(MarketingPostRequest prompt) {
         logger.info("Generating marketing post content for request: {}", prompt);
 
         Map<String, Object> requestBody = new HashMap<>();
@@ -58,26 +62,28 @@ public class MarketingPostGeminiServiceImpl implements MarketingPostGeminiServic
 
         try {
             logger.info("Sending request to AI API...");
-            ResponseEntity<String> response = restTemplate.exchange(URL, HttpMethod.POST, request, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(GEMINI_URL, HttpMethod.POST, request, String.class);
             logger.info("Received response from AI API with status: {}", response.getStatusCode());
 
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 List<MarketingPost> posts = parseJsonArrayResponse(response.getBody());
-                if (!posts.isEmpty()) {
-                    logger.info("Successfully generated {} marketing posts.", posts.size());
-                    return new ApiResponse<>(ResponseMessage.SUCCESS, ResponseMessage.MARKETING_POST_SUCCESS, posts);
-                } else {
-                    logger.warn("Failed to extract marketing posts from response.");
-                    return new ApiResponse<>(ResponseMessage.ERROR, ResponseMessage.MARKETING_POST_EXTRACTION_ERROR, Collections.emptyList());
+
+                for (MarketingPost post : posts) {
+                    String imageUrl = generateImage(post.getContent());
+
+                    post.setImageUrl(imageUrl);
                 }
-            } else {
-                logger.error("AI API response error: {}", response.getStatusCode());
-                return new ApiResponse<>(ResponseMessage.ERROR, ResponseMessage.MARKETING_POST_GENERATION_ERROR, Collections.emptyList());
+
+                if (!posts.isEmpty()) {
+                    logger.info("Successfully generated {} marketing posts with images.", posts.size());
+                    return new ApiResponse<>(ResponseMessage.SUCCESS, ResponseMessage.MARKETING_POST_SUCCESS, posts);
+                }
             }
         } catch (Exception e) {
             logger.error("Error while communicating with AI API", e);
-            return new ApiResponse<>(ResponseMessage.ERROR, ResponseMessage.MARKETING_POST_GENERATION_ERROR, Collections.emptyList());
         }
+
+        return new ApiResponse<>(ResponseMessage.ERROR, ResponseMessage.MARKETING_POST_GENERATION_ERROR, Collections.emptyList());
     }
 
     private List<MarketingPost> parseJsonArrayResponse(String responseBody) {
@@ -119,6 +125,49 @@ public class MarketingPostGeminiServiceImpl implements MarketingPostGeminiServic
 
         logger.debug("Extracting JSON array from response text.");
         return objectMapper.readValue(text, new TypeReference<List<MarketingPost>>() {});
+    }
+
+    private String generateImage(String prompt) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            List<Map<String, Object>> requestBody = new ArrayList<>();
+            Map<String, Object> auth = new HashMap<>();
+            auth.put("taskType", "authentication");
+            auth.put("apiKey", RUNWARE_API_KEY);
+
+            Map<String, Object> imageTask = new HashMap<>();
+            imageTask.put("taskType", "imageInference");
+            imageTask.put("taskUUID", UUID.randomUUID().toString());
+            imageTask.put("positivePrompt", prompt);
+            imageTask.put("width", 512);
+            imageTask.put("height", 512);
+            imageTask.put("model", "civitai:102438@133677");
+            imageTask.put("numberResults", 1);
+
+            requestBody.add(auth);
+            requestBody.add(imageTask);
+
+            HttpEntity<List<Map<String, Object>>> request = new HttpEntity<>(requestBody, headers);
+            ResponseEntity<String> response = restTemplate.exchange(RUNWARE_AI_URL, HttpMethod.POST, request, String.class);
+
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+
+                JsonNode rootNode = objectMapper.readTree(response.getBody());
+
+                JsonNode dataNode = rootNode.path("data");
+
+                if (dataNode.isArray() && !dataNode.isEmpty()) {
+                    return dataNode.get(0).path("imageURL").asText();
+                } else {
+                    logger.warn("No imageURL found in Runware AI response.");
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to generate image from Runware AI", e);
+        }
+        return null;
     }
 
 }

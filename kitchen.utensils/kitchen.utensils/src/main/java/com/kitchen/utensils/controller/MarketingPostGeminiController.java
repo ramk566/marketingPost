@@ -1,6 +1,7 @@
 package com.kitchen.utensils.controller;
 
 import com.kitchen.utensils.request.MarketingPost;
+import com.kitchen.utensils.request.PromptRequest;
 import com.kitchen.utensils.request.RequestDto;
 import com.kitchen.utensils.request.MarketingPostRequest;
 import com.kitchen.utensils.response.ApiResponse;
@@ -17,18 +18,19 @@ import java.util.Collections;
 @RequestMapping("/api/gemini")
 public class MarketingPostGeminiController {
 
-    private final MarketingPostGeminiService marketingPostService;
     private final MarketingPostPromptGeminiService marketingPostPromptService;
 
-    public MarketingPostGeminiController(MarketingPostGeminiService marketingPostService, MarketingPostPromptGeminiService marketingPostPromptService) {
-        this.marketingPostService = marketingPostService;
+    private final MarketingPostGeminiService marketingPostGeminiService;
+
+    public MarketingPostGeminiController(MarketingPostPromptGeminiService marketingPostPromptService, MarketingPostGeminiService marketingPostGeminiService) {
         this.marketingPostPromptService = marketingPostPromptService;
+        this.marketingPostGeminiService = marketingPostGeminiService;
     }
 
     @PostMapping("/generate-marketing")
     public ResponseEntity<ApiResponse<MarketingPost>> generate(@RequestBody MarketingPostRequest marketingPostRequest) {
         try {
-            ApiResponse<MarketingPost> response = marketingPostService.generateContent(marketingPostRequest);
+            ApiResponse<MarketingPost> response = marketingPostGeminiService.generateMarketingPostContent(marketingPostRequest);
             return ResponseEntity.ok(response);
         } catch (Exception ex) {
             return ResponseEntity.internalServerError()
@@ -38,13 +40,15 @@ public class MarketingPostGeminiController {
 
 
     @PostMapping("/generate-prompt")
-    public ResponseEntity<ApiResponse<MarketingPost>> generatePrompt(@RequestBody RequestDto promptDto) {
+    public ResponseEntity<ApiResponse<PromptRequest>> generatePrompt(@RequestBody RequestDto promptDto) {
         try {
-            ApiResponse<MarketingPost> response = marketingPostPromptService.generatePromptContent(promptDto);
+            ApiResponse<PromptRequest> response = marketingPostPromptService.generatePromptContent(promptDto);
             return ResponseEntity.ok(response);
         } catch (Exception ex) {
             return ResponseEntity.internalServerError()
                     .body(new ApiResponse<>(ResponseMessage.ERROR, "An unexpected error occurred", Collections.emptyList()));
         }
     }
+
+
 }

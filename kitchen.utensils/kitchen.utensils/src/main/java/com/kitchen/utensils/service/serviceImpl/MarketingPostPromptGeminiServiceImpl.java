@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kitchen.utensils.request.MarketingPost;
+import com.kitchen.utensils.request.PromptRequest;
 import com.kitchen.utensils.request.RequestDto;
 import com.kitchen.utensils.exception.AiApiException;
 import com.kitchen.utensils.message.ResponseMessage;
@@ -29,10 +29,10 @@ public class MarketingPostPromptGeminiServiceImpl implements MarketingPostPrompt
     private static final String URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY;
 
     @Override
-    public ApiResponse<MarketingPost> generatePromptContent(RequestDto promptDto) {
+    public ApiResponse<PromptRequest> generatePromptContent(RequestDto promptDto) {
         logger.info("Generating marketing post prompts for: {}", promptDto);
         try {
-            List<MarketingPost> posts = fetchAndParseAiResponse(promptDto);
+            List<PromptRequest> posts = fetchAndParseAiResponse(promptDto);
             logger.info("Successfully generated {} prompts.", posts.size());
             return new ApiResponse<>(ResponseMessage.SUCCESS, ResponseMessage.PROMPT_SUCCESS, posts);
         } catch (AiApiException e) {
@@ -41,7 +41,7 @@ public class MarketingPostPromptGeminiServiceImpl implements MarketingPostPrompt
         }
     }
 
-    private List<MarketingPost> fetchAndParseAiResponse(RequestDto promptDto) throws AiApiException {
+    private List<PromptRequest> fetchAndParseAiResponse(RequestDto promptDto) throws AiApiException {
         logger.debug("Preparing AI request body.");
         Map<String, Object> requestBody = createRequestBody(promptDto);
         HttpHeaders headers = new HttpHeaders();
@@ -98,7 +98,7 @@ public class MarketingPostPromptGeminiServiceImpl implements MarketingPostPrompt
         return part;
     }
 
-    private List<MarketingPost> parseJsonArrayResponse(String responseBody) throws AiApiException {
+    private List<PromptRequest> parseJsonArrayResponse(String responseBody) throws AiApiException {
         try {
             logger.debug("Parsing AI API response.");
             JsonNode rootNode = objectMapper.readTree(responseBody);
@@ -124,7 +124,7 @@ public class MarketingPostPromptGeminiServiceImpl implements MarketingPostPrompt
         }
     }
 
-    private List<MarketingPost> extractJsonArray(String text) throws JsonProcessingException {
+    private List<PromptRequest> extractJsonArray(String text) throws JsonProcessingException {
         text = text.trim();
 
         int startIndex = text.indexOf("[");
@@ -137,6 +137,6 @@ public class MarketingPostPromptGeminiServiceImpl implements MarketingPostPrompt
         text = text.substring(startIndex, endIndex + 1).trim();
 
         logger.debug("Extracting JSON array from response text.");
-        return objectMapper.readValue(text, new TypeReference<List<MarketingPost>>() {});
+        return objectMapper.readValue(text, new TypeReference<List<PromptRequest>>() {});
     }
 }

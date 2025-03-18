@@ -12,20 +12,18 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder({"No", "content"})
 
-public class MarketingPost {
+public class PromptRequest {
 
     @JsonProperty("No")
     private int No;
     private String content;
 
-    private String imageUrl;
 
-    public MarketingPost(){
+    public PromptRequest(){
 
     }
 
-    public MarketingPost(String imageUrl, int no, String content) {
-        this.imageUrl = imageUrl;
+    public PromptRequest(int no, String content) {
         No = no;
         this.content = content;
     }
@@ -45,13 +43,5 @@ public class MarketingPost {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
     }
 }
