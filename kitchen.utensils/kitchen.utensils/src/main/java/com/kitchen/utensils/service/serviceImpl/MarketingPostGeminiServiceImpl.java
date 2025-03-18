@@ -26,7 +26,7 @@ public class MarketingPostGeminiServiceImpl implements MarketingPostGeminiServic
     private static final String GEMINI_API_KEY = "AIzaSyADDv36cfbNwvbHTSODWJFIa69eJxuz6fo";
     private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
     private static final String RUNWARE_AI_URL = "https://api.runware.ai/v1";
-    private static final String RUNWARE_API_KEY = "QLHKNkitolTw90rMBYakcyUnpBGdSDZR";
+    private static final String RUNWARE_API_KEY = "SyTVIqzaW3Luqt04IbRKt9RGswMXOJfp";
 
 
     @Override

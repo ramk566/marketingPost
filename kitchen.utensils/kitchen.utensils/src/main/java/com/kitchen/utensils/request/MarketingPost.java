@@ -24,12 +24,11 @@ public class MarketingPost {
 
     }
 
-    public MarketingPost(String imageUrl, int no, String content) {
-        this.imageUrl = imageUrl;
+    public MarketingPost(int no, String content, String imageUrl) {
         No = no;
         this.content = content;
+        this.imageUrl = imageUrl;
     }
-
 
     public int getNo() {
         return No;
